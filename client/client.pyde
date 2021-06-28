@@ -15,9 +15,6 @@ soundMusic = None
 def setup():
     size(1366, 768)
     
-    fontList= PFont.list()
-    printArray(fontList)
-    
     global bgImage, friendCastleImage
     global testChar01, testChar02, testChar03
     global typingMng
@@ -55,21 +52,40 @@ def draw():
     
     square(200, 200, 80)
     
-class TypingManager(object):
+class TypingManager():
 
     def __init__(self):
-        # self.font = loadFont("YuKyo-Medium-48.vlw")
-        self.font = createFont("UDDigiKyokashoNK-R", 48)
-        self.input = ""
+        self.x = 400
+        self.y = 100
+        self.fontHeight = 48
+        # self.font = createFont("UDDigiKyokashoNK-R", self.fontHeight)
+        self.font = createFont("JF-Dot-Ayu-18", self.fontHeight)
+        self.mondai = []
+        self.yomi = []
+        self.romazi = []
+        self.mondaiNo = 0
+        self.mondaiMax = 0
         self.soundEffect = SoundFile(this, "key04.mp3")
+        self.textReader = createReader("mondai.txt")
+
+        self.input = ""
+        
+        textFont(self.font)
         self.soundEffect.amp(1)
 
-        self.textReader = createReader("mondai.txt")
-        linetext = self.textReader.readLine()
-        pieces = split(linetext, ",");
-        println(pieces[0])
-    
-
+        # 問題ファイルの読み込み
+        buf = ""
+        record = ""
+        while buf <> None:
+            buf = self.textReader.readLine()
+            if buf <> None:
+                record = split(buf, ",");
+                self.mondai.append(record[0])
+                self.yomi.append(record[1])
+                self.romazi.append(record[2])
+                self.mondaiMax += 1
+                
+        # いおあｊふぉいえじゃふぃ
 
     def keyPressed(self):
         self.soundEffect.stop()
@@ -77,15 +93,25 @@ class TypingManager(object):
     
         if key == ENTER:
             self.input = "EnTeR"
+            self.mondaiNo += 1
+            if self.mondaiNo >= self.mondaiMax:
+                self.mondaiNo = 0
+            
         elif "a" <= key <= "z" or "A" <= key <= "Z" or key == " ":
             self.input = self.input + key
         
     def display(self):
-        textFont(self.font)
-        text(self.input, 100, 100)
-        text(key, 100, 160)
-        textFont(self.font, 48)
-        text(u"山田！！！！山田やまだ", 100, 200)
+        textSize(self.fontHeight)
+        fill(255)
+        text(self.mondai[self.mondaiNo], self.x, self.y)
+        textSize(self.fontHeight - 30)
+        fill(200)
+        text(self.yomi[self.mondaiNo], self.x, self.y + 24)
+        textSize(self.fontHeight)
+        fill(255)
+        text(self.romazi[self.mondaiNo], self.x, self.y + 64)
+        text(self.input, self.x, self.y + self.fontHeight * 4)
+        text(key, self.x, self.y + self.fontHeight * 5)
         
 class CharatorFriend:
 
