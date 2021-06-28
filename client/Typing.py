@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+import processing.sound.*
+
 class TypingManager:
 
     def __init__(self):
