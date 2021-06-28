@@ -1,5 +1,8 @@
+add_library("sound")
+
 import Charactor
 import Typing
+
 
 bgImage = None
 friendImage = None
@@ -10,6 +13,9 @@ testChar02 = None
 testChar03 = None
 typingMng = None
 
+soundMusic = None
+
+
 def setup():
     size(1366, 768)
     
@@ -19,9 +25,9 @@ def setup():
     global bgImage, friendCastleImage
     global testChar01, testChar02, testChar03
     global typingMng
+    global soundMusic
 
     bgImage = loadImage("typingWar_background.png")
-
     friendCastleImage = loadImage("typingWar_friendCastle.png")
 
     testChar01 = Charactor.CharatorFriend(1366-64-100, 768-160, 2, "aquorsChika")
@@ -29,11 +35,19 @@ def setup():
     testChar03 = Charactor.CharatorFriend(1366-64-300, 768-160, 2, "aquorsChika")
     typingMng = Typing.TypingManager()
     
+    soundMusic = SoundFile(this, "Battle-forHonor_SNES.mp3")
+    soundMusic.amp(0.2)
+    soundMusic.loop()
+
+
 def keyPressed():
+    global typingMng
     typingMng.keyPressed()
-        
+    
+    
 def draw():
     background(0)
+    
     
     image(bgImage, 0, 0)
     image(friendCastleImage, 1366-80, 768-256+32)
@@ -44,3 +58,4 @@ def draw():
     typingMng.display()
     
     square(200, 200, 80)
+    

@@ -1,14 +1,24 @@
 # -*- coding: utf-8 -*-
-
 class TypingManager:
 
     def __init__(self):
         # self.font = loadFont("YuKyo-Medium-48.vlw")
-        # self.font = createFont("YuKyo-Bold", 48)
         self.font = createFont("UDDigiKyokashoNK-R", 48)
         self.input = ""
+        self.soundEffect = SoundFile(this, "key04.mp3")
+        self.soundEffect.amp(1)
+
+        self.textReader = createReader("mondai.txt")
+        linetext = self.textReader.readLine()
+        pieces = split(linetext, ",");
+        println(pieces[0])
+    
+
 
     def keyPressed(self):
+        # self.soundEffect.stop()
+        # self.soundEffect.play()
+    
         if key == ENTER:
             self.input = "EnTeR"
         elif "a" <= key <= "z" or "A" <= key <= "Z" or key == " ":
