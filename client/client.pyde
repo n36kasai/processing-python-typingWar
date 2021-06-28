@@ -28,9 +28,11 @@ def setup():
     testChar03 = CharatorFriend(1366-64-300, 768-160, 2, "aquorsChika")
     typingMng = TypingManager()
     
-    soundMusic = SoundFile(this, "Battle-forHonor_SNES.mp3")
-    soundMusic.amp(0.2)
+    # soundMusic = SoundFile(this, "Battle-forHonor_SNES.mp3")
+    soundMusic = SoundFile(this, "bgm03.mp3")
+    soundMusic.amp(0.3)
     soundMusic.loop()
+    soundMusic.jump(4.35)
 
 
 def keyPressed():
@@ -58,8 +60,8 @@ class TypingManager():
         self.x = 400
         self.y = 100
         self.fontHeight = 48
-        # self.font = createFont("UDDigiKyokashoNK-R", self.fontHeight)
-        self.font = createFont("JF-Dot-Ayu-18", self.fontHeight)
+        self.font = createFont("UDDigiKyokashoNK-R", self.fontHeight)
+        # self.font = createFont("JF-Dot-Ayu-18", self.fontHeight)
         self.mondai = []
         self.yomi = []
         self.romazi = []
@@ -69,6 +71,8 @@ class TypingManager():
         self.textReader = createReader("mondai.txt")
 
         self.input = ""
+        self.kaitou = ""
+        self.kaitouPos = 0
         
         textFont(self.font)
         self.soundEffect.amp(1)
@@ -85,7 +89,9 @@ class TypingManager():
                 self.romazi.append(record[2])
                 self.mondaiMax += 1
                 
-        # いおあｊふぉいえじゃふぃ
+        # 1問目準備
+        self.kaitou = str(self.romazi[self.mondaiNo]) #キャストしないとUnicodeオブジェクトのままで厄介
+        
 
     def keyPressed(self):
         self.soundEffect.stop()
@@ -96,22 +102,59 @@ class TypingManager():
             self.mondaiNo += 1
             if self.mondaiNo >= self.mondaiMax:
                 self.mondaiNo = 0
+        else:
             
-        elif "a" <= key <= "z" or "A" <= key <= "Z" or key == " ":
-            self.input = self.input + key
+            # タイピング大戦争形式
+            # if key == self.kaitou[0]:
+            #     if len(self.kaitou) == 1:
+            #         self.mondaiNo += 1
+            #         if self.mondaiNo >= self.mondaiMax:
+            #             self.mondaiNo = 0
+            #         self.kaitou = self.romazi[self.mondaiNo]
+            #     else:
+            #         self.kaitou = self.kaitou[1:len(self.kaitou)]
+
+            if key == self.kaitou[self.kaitouPos]:
+                if self.kaitouPos >= len(self.kaitou) - 1:
+                    self.mondaiNo += 1
+                    self.kaitouPos = 0
+                    if self.mondaiNo >= self.mondaiMax:
+                        self.mondaiNo = 0
+                    self.kaitou = self.romazi[self.mondaiNo]
+                else:                    
+                    self.kaitouPos += 1
+            
+                
+        # elif "a" <= key <= "z" or "A" <= key <= "Z" or key == " ":
+        #     self.input = self.input + key
         
     def display(self):
+        
+        # 問題文
         textSize(self.fontHeight)
         fill(255)
         text(self.mondai[self.mondaiNo], self.x, self.y)
+        
+        # ひらがな
         textSize(self.fontHeight - 30)
         fill(200)
         text(self.yomi[self.mondaiNo], self.x, self.y + 24)
+        
+        # ローマ字
         textSize(self.fontHeight)
         fill(255)
         text(self.romazi[self.mondaiNo], self.x, self.y + 64)
-        text(self.input, self.x, self.y + self.fontHeight * 4)
-        text(key, self.x, self.y + self.fontHeight * 5)
+        
+        # 解答欄（タイピング大戦争形式）
+        # text(self.kaitou, self.x, self.y + 120)
+
+        text(self.kaitou, self.x, self.y + 120)
+        fill(255, 100, 100)
+        text(self.kaitou[0:self.kaitouPos], self.x, self.y + 120)
+        
+        # デバッグ
+        fill(255)
+        text(key, self.x, self.y + 400)
         
 class CharatorFriend:
 
