@@ -1,5 +1,6 @@
 add_library("sound")
 
+
 bgImage = None
 friendImage = None
 friendCastleImage = None
