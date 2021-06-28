@@ -59,3 +59,63 @@ def draw():
     
     square(200, 200, 80)
     
+class TypingManager(object):
+
+    def __init__(self):
+        # self.font = loadFont("YuKyo-Medium-48.vlw")
+        self.font = createFont("UDDigiKyokashoNK-R", 48)
+        self.input = ""
+        self.soundEffect = SoundFile(this, "key04.mp3")
+        self.soundEffect.amp(1)
+
+        self.textReader = createReader("mondai.txt")
+        linetext = self.textReader.readLine()
+        pieces = split(linetext, ",");
+        println(pieces[0])
+    
+
+
+    def keyPressed(self):
+        # self.soundEffect.stop()
+        # self.soundEffect.play()
+    
+        if key == ENTER:
+            self.input = "EnTeR"
+        elif "a" <= key <= "z" or "A" <= key <= "Z" or key == " ":
+            self.input = self.input + key
+        
+    def display(self):
+        textFont(self.font)
+        text(self.input, 100, 100)
+        text(key, 100, 160)
+        textFont(self.font, 48)
+        text(u"山田！！！！山田やまだ", 100, 200)
+        
+class CharatorFriend:
+
+    def __init__(self, x, y, fr, fileName):
+        self.charImages = list()
+        self.posX = x
+        self.posY = y
+        self.posFrame = 0
+        self.maxFrame = fr
+        self.nFrame = 0
+        
+        for i in range(1, self.maxFrame+1):
+            na = "aquorsChika0" + str(i) + ".png"
+            self.charImages.append(loadImage(na))
+        
+    def display(self):
+        image(self.charImages[self.nFrame], self.posX, self.posY - self.nFrame * 4)
+
+        
+            
+        if frameCount % 30 == 0:
+            self.posX = self.posX - 3
+            if self.posX < 0:
+                self.posX = width
+            if self.nFrame >= self.maxFrame - 1:
+                self.nFrame = 0
+            else:
+                self.nFrame = self.nFrame + 1 
+        
