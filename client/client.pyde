@@ -23,29 +23,35 @@ def setup():
     bgImage = loadImage("typingWar_background.png")
     friendCastleImage = loadImage("typingWar_friendCastle.png")
 
-    testChar01 = CharatorFriend(1366-64-100, 768-160, 2, "aquorsChika")
-    testChar02 = CharatorFriend(1366-64-200, 768-160, 1, "aquorsMari")
-    testChar03 = CharatorFriend(1366-64-300, 768-160, 2, "aquorsChika")
+    testChar01 = CharatorFriend(1366-64-100, 768-160, "aquorsChika0", 2)
+    testChar02 = CharatorFriend(1366-64-200, 768-160, "aquorsMari0", 1)
+    testChar03 = CharatorFriend(1366-64-300, 768-160, "aquorsChika0", 2)
     typingMng = TypingManager()
     
     # soundMusic = SoundFile(this, "Battle-forHonor_SNES.mp3")
     soundMusic = SoundFile(this, "bgm03.mp3")
     soundMusic.amp(0.3)
     soundMusic.loop()
-    soundMusic.jump(4.35)
+    soundMusic.jump(275)
 
 
 def keyPressed():
-    global typingMng
     typingMng.keyPressed()
     
     
 def draw():
+    render()
+
+
+def render():
     background(0)
-    
-    
+
     image(bgImage, 0, 0)
     image(friendCastleImage, 1366-80, 768-256+32)
+
+    testChar01.move()
+    testChar02.move()
+    testChar03.move()
 
     testChar01.display()
     testChar02.display()
@@ -53,6 +59,7 @@ def draw():
     typingMng.display()
     
     square(200, 200, 80)
+    
     
 class TypingManager():
 
@@ -143,44 +150,61 @@ class TypingManager():
         # ローマ字
         textSize(self.fontHeight)
         fill(255)
-        text(self.romazi[self.mondaiNo], self.x, self.y + 64)
+        # text(self.romazi[self.mondaiNo], self.x, self.y + 64)
         
         # 解答欄（タイピング大戦争形式）
         # text(self.kaitou, self.x, self.y + 120)
 
-        text(self.kaitou, self.x, self.y + 120)
+        text(self.kaitou, self.x, self.y + 64)
         fill(255, 100, 100)
         text(self.kaitou[0:self.kaitouPos], self.x, self.y + 120)
         
         # デバッグ
         fill(255)
         text(key, self.x, self.y + 400)
-        
+
+class Charator:
+    test = 0
+            
 class CharatorFriend:
 
-    def __init__(self, x, y, fr, fileName):
+    def __init__(self, x, y, fname, fr):
         self.charImages = list()
         self.posX = x
         self.posY = y
-        self.posFrame = 0
-        self.maxFrame = fr
-        self.nFrame = 0
+        self.fileName = fname
+        self.frameMax = fr
+        self.framePos = 0
+        self.animationFrameRate = 30
+        self.speed = -3
+        self.jump = 4
+        self.isJump = False
         
-        for i in range(1, self.maxFrame+1):
-            na = "aquorsChika0" + str(i) + ".png"
-            self.charImages.append(loadImage(na))
-        
-    def display(self):
-        image(self.charImages[self.nFrame], self.posX, self.posY - self.nFrame * 4)
-
-        
+        for i in range(1, self.frameMax + 1):
+            nm = self.fileName + str(i) + ".png"
+            self.charImages.append(loadImage(nm))
             
-        if frameCount % 30 == 0:
-            self.posX = self.posX - 3
+    def move(self):
+        if self.canAnimate() == True:
+            
+            self.posX += self.speed
             if self.posX < 0:
                 self.posX = width
-            if self.nFrame >= self.maxFrame - 1:
-                self.nFrame = 0
+                
+            if self.isJump == True:
+                self.posY += self.jump
+                self.isJump = False
             else:
-                self.nFrame = self.nFrame + 1 
-        
+                self.posY -= self.jump
+                self.isJump = True
+
+            if self.framePos >= self.frameMax - 1:
+                self.framePos = 0
+            else:
+                self.framePos += 1 
+                        
+    def display(self):
+        image(self.charImages[self.framePos], self.posX, self.posY)
+
+    def canAnimate(self):
+        return  frameCount % self.animationFrameRate == 0
