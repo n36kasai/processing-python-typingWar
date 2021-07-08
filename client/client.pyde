@@ -66,13 +66,14 @@ class TypingManager():
     def __init__(self):
         self.x = 400
         self.y = 100
+        self.dispMode = "DAISENSOU"
         self.fontHeight = 48
         self.font = createFont("UDDigiKyokashoNK-R", self.fontHeight)
         # self.font = createFont("JF-Dot-Ayu-18", self.fontHeight)
         self.mondai = []
         self.yomi = []
         self.romazi = []
-        self.mondaiNo = 0
+        self.mondaiPos = 0
         self.mondaiMax = 0
         self.soundEffect = SoundFile(this, "key04.mp3")
         self.textReader = createReader("mondai.txt")
@@ -97,7 +98,7 @@ class TypingManager():
                 self.mondaiMax += 1
                 
         # 1問目準備
-        self.kaitou = str(self.romazi[self.mondaiNo]) #キャストしないとUnicodeオブジェクトのままで厄介
+        self.kaitou = str(self.romazi[self.mondaiPos]) #キャストしないとUnicodeオブジェクトのままで厄介
         
 
     def keyPressed(self):
@@ -106,62 +107,61 @@ class TypingManager():
     
         if key == ENTER:
             self.input = "EnTeR"
-            self.mondaiNo += 1
-            if self.mondaiNo >= self.mondaiMax:
-                self.mondaiNo = 0
+            self.mondaiPos += 1
+            if self.mondaiPos >= self.mondaiMax:
+                self.mondaiPos = 0
         else:
-            
-            # タイピング大戦争形式
-            # if key == self.kaitou[0]:
-            #     if len(self.kaitou) == 1:
-            #         self.mondaiNo += 1
-            #         if self.mondaiNo >= self.mondaiMax:
-            #             self.mondaiNo = 0
-            #         self.kaitou = self.romazi[self.mondaiNo]
-            #     else:
-            #         self.kaitou = self.kaitou[1:len(self.kaitou)]
+            if self.dispMode == "DAISENSOU":
+                self.dispDaisensou()
+            elif self.dispMode == "NORMAL":
+                self.dispNormal()
 
-            if key == self.kaitou[self.kaitouPos]:
-                if self.kaitouPos >= len(self.kaitou) - 1:
-                    self.mondaiNo += 1
-                    self.kaitouPos = 0
-                    if self.mondaiNo >= self.mondaiMax:
-                        self.mondaiNo = 0
-                    self.kaitou = self.romazi[self.mondaiNo]
-                else:                    
-                    self.kaitouPos += 1
-            
                 
         # elif "a" <= key <= "z" or "A" <= key <= "Z" or key == " ":
         #     self.input = self.input + key
-        
+    def dispDaisensou(self):
+        # タイピング大戦争形式
+        if key == self.kaitou[self.kaitouPos]:
+            if len(self.kaitou) == 1:
+                self.mondaiPos += 1
+                if self.mondaiPos >= self.mondaiMax:
+                    self.mondaiPos = 0
+                self.kaitou = self.romazi[self.mondaiPos]
+            else:
+                self.kaitou = self.kaitou[1:len(self.kaitou)]
+    
+    def dispNormal(self):
+        if key == self.kaitou[self.kaitouPos]:
+            if self.kaitouPos >= len(self.kaitou) - 1:
+                self.mondaiPos += 1
+                self.kaitouPos = 0
+                if self.mondaiPos >= self.mondaiMax:
+                    self.mondaiPos = 0
+                self.kaitou = self.romazi[self.mondaiPos]
+            else:                    
+                self.kaitouPos += 1
+    
     def display(self):
         
         # 問題文
         textSize(self.fontHeight)
         fill(255)
-        text(self.mondai[self.mondaiNo], self.x, self.y)
+        text(self.mondai[self.mondaiPos], self.x, self.y)
         
         # ひらがな
         textSize(self.fontHeight - 30)
         fill(200)
-        text(self.yomi[self.mondaiNo], self.x, self.y + 24)
+        text(self.yomi[self.mondaiPos], self.x, self.y + 24)
         
-        # ローマ字
+        # ローマ字＆解答
         textSize(self.fontHeight)
         fill(255)
-        # text(self.romazi[self.mondaiNo], self.x, self.y + 64)
-        
-        # 解答欄（タイピング大戦争形式）
-        # text(self.kaitou, self.x, self.y + 120)
-
-        text(self.kaitou, self.x, self.y + 64)
-        fill(255, 100, 100)
-        text(self.kaitou[0:self.kaitouPos], self.x, self.y + 120)
-        
-        # デバッグ
-        fill(255)
-        text(key, self.x, self.y + 400)
+        if self.dispMode == "NORMAL":
+            text(self.romazi[self.mondaiPos], self.x, self.y + 64)
+            fill(255, 100, 100)
+            text(self.kaitou[0:self.kaitouPos], self.x, self.y + 64)
+        if self.dispMode == "DAISENSOU":
+            text(self.kaitou, self.x, self.y + 64)
 
 class Charator:
     test = 0
